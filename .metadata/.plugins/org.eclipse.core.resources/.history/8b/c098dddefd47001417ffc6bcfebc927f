@@ -1,0 +1,10 @@
+package com.hibernate.examples;
+
+public class Test {
+	public static void main(String[] args) {
+		Employee ram = new Employee();
+		ram.setId(1001);
+		ram.setName("Ram");
+		ram.setSalary(90000);
+	}
+}

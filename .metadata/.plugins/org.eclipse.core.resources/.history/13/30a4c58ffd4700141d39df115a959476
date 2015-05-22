@@ -1,0 +1,5 @@
+package com.hibernate.examples;
+
+public class EmployeeDAO {
+
+}

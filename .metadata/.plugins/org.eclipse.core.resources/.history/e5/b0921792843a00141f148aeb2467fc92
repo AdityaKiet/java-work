@@ -1,0 +1,587 @@
+package com.mentor.jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import com.mentor.dto.AttendenceDTO;
+import com.mentor.dto.ExtraActivitiesDTO;
+import com.mentor.dto.ParentDTO;
+import com.mentor.dto.PercentageDTO;
+import com.mentor.dto.SecondPageDTO;
+import com.mentor.dto.StudentDTO;
+
+/**
+ * 
+ * @author Aditya Set of methods to get data from Database of Mentor Form
+ *         Module.
+ * 
+ */
+public class JDBC {
+
+	/**
+	 * 
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 *             It creates connection with database.
+	 */
+	private static Connection getConnection() throws ClassNotFoundException,
+			SQLException {
+		ResourceBundle rb = ResourceBundle.getBundle("db");
+		String driverName = rb.getString("drivername");
+		Class.forName(driverName);
+		System.out.println("Driver Loaded...");
+		String url = rb.getString("dburl");
+		String userid = rb.getString("userid");
+		String password = rb.getString("password");
+		Connection con = DriverManager.getConnection(url, userid, password);
+		if (con != null) {
+			System.out.println("Connection Ready...");
+		}
+		return con;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 *             Takes the list of department from Database.
+	 */
+	public static List<String> getBranches() throws ClassNotFoundException,
+			SQLException {
+		List<String> branches = new ArrayList<>();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement("select * from department");
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				branches.add(rs.getString("Dept_Name"));
+			}
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return branches;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 *             Gives the list of hostels stored in database.
+	 */
+	public static List<String> getHostel() throws ClassNotFoundException,
+			SQLException {
+		List<String> hostel = new ArrayList<>();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement("select * from hostel");
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				hostel.add(rs.getString("hostel_name"));
+			}
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return hostel;
+	}
+
+	/**
+	 * 
+	 * @param studentDTO
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public static boolean saveStudentData(StudentDTO studentDTO)
+			throws SQLException, ClassNotFoundException {
+		boolean result = false;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		int resultSet;
+		try {
+			con = getConnection();
+			pstmt = con
+					.prepareStatement("insert into student_info values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			con.setAutoCommit(false);
+			pstmt.setString(1, studentDTO.getDept());
+			pstmt.setString(2, studentDTO.getName());
+			pstmt.setString(3, studentDTO.getRoll_no());
+			pstmt.setString(4, studentDTO.getEnrollment());
+			pstmt.setString(5, studentDTO.getBatch());
+			pstmt.setString(6, "" + studentDTO.getSection());
+			pstmt.setInt(7, studentDTO.getIsHosteller());
+			pstmt.setString(8, studentDTO.getNameOfHostel());
+			pstmt.setString(9, studentDTO.getRoomno());
+			pstmt.setString(10, studentDTO.getRoomPartner1());
+			pstmt.setString(11, studentDTO.getRoomPartner2());
+			pstmt.setString(12, studentDTO.getRoomPartner3());
+			pstmt.setString(13, studentDTO.getPhoneno());
+			pstmt.setString(14, studentDTO.getEmailid());
+			pstmt.setString(15, studentDTO.getAddress());
+			pstmt.setString(16, studentDTO.getFather().getName());
+			pstmt.setString(17, studentDTO.getFather().getQualification());
+			pstmt.setString(18, studentDTO.getFather().getProfession());
+			pstmt.setString(19, studentDTO.getFather().getOccupation());
+			pstmt.setString(20, studentDTO.getFather().getAnnual_income());
+			pstmt.setString(21, studentDTO.getMother().getName());
+			pstmt.setString(22, studentDTO.getMother().getQualification());
+			pstmt.setString(23, studentDTO.getMother().getProfession());
+			pstmt.setString(24, studentDTO.getMother().getOccupation());
+			pstmt.setString(25, studentDTO.getMother().getAnnual_income());
+			pstmt.setString(26, studentDTO.getFather().getAddress());
+			pstmt.setString(27, studentDTO.getFather().getPhone_no());
+			pstmt.setString(28, studentDTO.getFather().getEmailid());
+			pstmt.setString(29, studentDTO.getMother().getAddress());
+			pstmt.setString(30, studentDTO.getMother().getPhone_no());
+			pstmt.setString(31, studentDTO.getMother().getEmailid());
+			pstmt.setString(32, studentDTO.getLocal_guardian().getName());
+			pstmt.setString(33, studentDTO.getLocal_guardian().getAddress());
+			pstmt.setString(34, studentDTO.getLocal_guardian().getPhone_no());
+			pstmt.setString(35, studentDTO.getLocal_guardian().getEmailid());
+			resultSet = pstmt.executeUpdate();
+			if (resultSet > 0) {
+				con.commit();
+				result = true;
+			} else {
+				con.rollback();
+			}
+		} finally {
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param rollno
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public static StudentDTO getStudentDetails(String rollno)
+			throws ClassNotFoundException, SQLException {
+		StudentDTO studentDTO = new StudentDTO();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			con = getConnection();
+			pstmt = con
+					.prepareStatement("select * from student_info where roll_no = '"
+							+ rollno + "'");
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				studentDTO.setName(rs.getString("name"));
+				studentDTO.setDept(rs.getString("dept"));
+				studentDTO.setRoll_no(rs.getString("roll_no"));
+				studentDTO.setEnrollment(rs.getString("enrollment_no"));
+				studentDTO.setBatch(rs.getString("batch"));
+				studentDTO.setSection(rs.getString("section").charAt(0));
+				studentDTO.setIsHosteller(rs.getInt("isHosteller"));
+				studentDTO.setNameOfHostel(rs.getString("nameOfHostel"));
+				studentDTO.setRoomno(rs.getString("room_no"));
+				studentDTO.setRoomPartner1(rs.getString("room_partner1"));
+				studentDTO.setRoomPartner2(rs.getString("room_partner2"));
+				studentDTO.setRoomPartner3(rs.getString("room_partner3"));
+				studentDTO.setPhoneno(rs.getString("phone_no"));
+				studentDTO.setEmailid(rs.getString("email_id"));
+				studentDTO.setAddress(rs.getString("current_address"));
+				ParentDTO dto = new ParentDTO();
+				dto.setName(rs.getString("father_name"));
+				dto.setQualification(rs.getString("father_qualification"));
+				dto.setProfession(rs.getString("father_profession"));
+				dto.setOccupation(rs.getString("father_occupation"));
+				dto.setAnnual_income(rs.getString("father_annual_income"));
+				dto.setAddress(rs.getString("permanent_address"));
+				dto.setPhone_no(rs.getString("permanent_phoneno"));
+				dto.setEmailid(rs.getString("permanent_email"));
+				studentDTO.setFather(dto);
+				dto = null;
+				dto = new ParentDTO();
+				dto.setName(rs.getString("mother_name"));
+				dto.setQualification(rs.getString("mother_qualification"));
+				dto.setProfession(rs.getString("mother_profession"));
+				dto.setOccupation(rs.getString("mother_occupation"));
+				dto.setAnnual_income(rs.getString("mother_annual_income"));
+				dto.setAddress(rs.getString("contact_address"));
+				dto.setPhone_no(rs.getString("contact_phoneno"));
+				dto.setEmailid(rs.getString("contact_email"));
+				studentDTO.setMother(dto);
+				dto = null;
+				dto = new ParentDTO();
+				dto.setName(rs.getString("localguardian_name"));
+				dto.setAddress(rs.getString("localguardian_address"));
+				dto.setPhone_no(rs.getString("localguardian_phoneno"));
+				dto.setEmailid(rs.getString("localguardian_email"));
+				studentDTO.setLocal_guardian(dto);
+				dto = null;
+			} else {
+				studentDTO = null;
+			}
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return studentDTO;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public static List<String> getIncomeList() throws ClassNotFoundException,
+			SQLException {
+		List<String> income = new ArrayList<>();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection();
+			pstmt = con.prepareStatement("select * from income");
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				income.add(rs.getString("Income"));
+			}
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return income;
+	}
+
+	/**
+	 * 
+	 * @param studentDTO
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public static boolean updateStudentData(StudentDTO studentDTO)
+			throws SQLException, ClassNotFoundException {
+		boolean result = false;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		int resultSet;
+		try {
+			con = getConnection();
+			pstmt = con
+					.prepareStatement("update student_info set dept =?,name=?,roll_no=?,enrollment_no=?,batch=?,section=?,isHosteller=?,nameOfHostel=?,room_no=?,room_partner1=?,room_partner2=?,room_partner3=?,phone_no=?,email_id=?,current_address=?,father_name=?,father_qualification=?,father_profession=?,father_occupation=?,father_annual_income=?,mother_name=?,mother_qualification=?,mother_profession=?,mother_occupation=?,mother_annual_income=?,permanent_address=?,permanent_phoneno=?,permanent_email=?,contact_address=?,contact_phoneno=?,contact_email=?,localguardian_name=?,localguardian_address=?,localguardian_phoneno=?,localguardian_email=? where roll_no = '"
+							+ studentDTO.getRoll_no() + "'");
+			con.setAutoCommit(false);
+			pstmt.setString(1, studentDTO.getDept());
+			pstmt.setString(2, studentDTO.getName());
+			pstmt.setString(3, studentDTO.getRoll_no());
+			pstmt.setString(4, studentDTO.getEnrollment());
+			pstmt.setString(5, studentDTO.getBatch());
+			pstmt.setString(6, "" + studentDTO.getSection());
+			pstmt.setInt(7, studentDTO.getIsHosteller());
+			pstmt.setString(8, studentDTO.getNameOfHostel());
+			pstmt.setString(9, studentDTO.getRoomno());
+			pstmt.setString(10, studentDTO.getRoomPartner1());
+			pstmt.setString(11, studentDTO.getRoomPartner2());
+			pstmt.setString(12, studentDTO.getRoomPartner3());
+			pstmt.setString(13, studentDTO.getPhoneno());
+			pstmt.setString(14, studentDTO.getEmailid());
+			pstmt.setString(15, studentDTO.getAddress());
+			pstmt.setString(16, studentDTO.getFather().getName());
+			pstmt.setString(17, studentDTO.getFather().getQualification());
+			pstmt.setString(18, studentDTO.getFather().getProfession());
+			pstmt.setString(19, studentDTO.getFather().getOccupation());
+			pstmt.setString(20, studentDTO.getFather().getAnnual_income());
+			pstmt.setString(21, studentDTO.getMother().getName());
+			pstmt.setString(22, studentDTO.getMother().getQualification());
+			pstmt.setString(23, studentDTO.getMother().getProfession());
+			pstmt.setString(24, studentDTO.getMother().getOccupation());
+			pstmt.setString(25, studentDTO.getMother().getAnnual_income());
+			pstmt.setString(26, studentDTO.getFather().getAddress());
+			pstmt.setString(27, studentDTO.getFather().getPhone_no());
+			pstmt.setString(28, studentDTO.getFather().getEmailid());
+			pstmt.setString(29, studentDTO.getMother().getAddress());
+			pstmt.setString(30, studentDTO.getMother().getPhone_no());
+			pstmt.setString(31, studentDTO.getMother().getEmailid());
+			pstmt.setString(32, studentDTO.getLocal_guardian().getName());
+			pstmt.setString(33, studentDTO.getLocal_guardian().getAddress());
+			pstmt.setString(34, studentDTO.getLocal_guardian().getPhone_no());
+			pstmt.setString(35, studentDTO.getLocal_guardian().getEmailid());
+			resultSet = pstmt.executeUpdate();
+			if (resultSet > 0) {
+				con.commit();
+				result = true;
+			} else {
+				con.rollback();
+			}
+		} finally {
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 */
+	public static boolean saveSecondPageStudentData(SecondPageDTO secondPageDTO)
+			throws SQLException, ClassNotFoundException {
+		boolean result = false;
+		Connection con = null;
+		PreparedStatement pstmt1 = null;
+		PreparedStatement pstmt2 = null;
+		PreparedStatement pstmt3 = null;
+		int rs1 = 0;
+		int rs2 = 0;
+		int rs3 = 0;
+		AttendenceDTO attendenceDTO = secondPageDTO.getAttendenceDTO();
+		PercentageDTO percentageDTO = secondPageDTO.getPercentageDTO();
+		ExtraActivitiesDTO extraActivitiesDTO = secondPageDTO
+				.getExtraActivitiesDTO();
+		String roll_no = secondPageDTO.getRoll_no();
+
+		try {
+			con = getConnection();
+			con.setAutoCommit(false);
+			pstmt1 = con
+					.prepareStatement("insert into aggregate_attendance values(?,?,?,?,?,?,?,?,?)");
+			pstmt1.setString(1, roll_no);
+			pstmt1.setString(2, attendenceDTO.getSem1Attendence());
+			pstmt1.setString(3, attendenceDTO.getSem2Attendence());
+			pstmt1.setString(4, attendenceDTO.getSem3Attendence());
+			pstmt1.setString(5, attendenceDTO.getSem4Attendence());
+			pstmt1.setString(6, attendenceDTO.getSem5Attendence());
+			pstmt1.setString(7, attendenceDTO.getSem6Attendence());
+			pstmt1.setString(8, attendenceDTO.getSem7Attendence());
+			pstmt1.setString(9, attendenceDTO.getSem8Attendence());
+			rs1 = pstmt1.executeUpdate();
+
+			pstmt2 = con
+					.prepareStatement("insert into percentage_master values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			pstmt2.setString(1, roll_no);
+			pstmt2.setString(2, percentageDTO.getSem1percent());
+			pstmt2.setInt(3, percentageDTO.getSem1backs());
+			pstmt2.setInt(4, percentageDTO.getSem1communication());
+			pstmt2.setInt(5, percentageDTO.getSem1responce());
+			pstmt2.setString(6, percentageDTO.getSem2percent());
+			pstmt2.setInt(7, percentageDTO.getSem2backs());
+			pstmt2.setInt(8, percentageDTO.getSem2communication());
+			pstmt2.setInt(9, percentageDTO.getSem2responce());
+			pstmt2.setString(10, percentageDTO.getSem3percent());
+			pstmt2.setInt(11, percentageDTO.getSem3backs());
+			pstmt2.setInt(12, percentageDTO.getSem3communication());
+			pstmt2.setInt(13, percentageDTO.getSem3responce());
+			pstmt2.setString(14, percentageDTO.getSem4percent());
+			pstmt2.setInt(15, percentageDTO.getSem4backs());
+			pstmt2.setInt(16, percentageDTO.getSem4communication());
+			pstmt2.setInt(17, percentageDTO.getSem4responce());
+			pstmt2.setString(18, percentageDTO.getSem5percent());
+			pstmt2.setInt(19, percentageDTO.getSem5backs());
+			pstmt2.setInt(20, percentageDTO.getSem5communication());
+			pstmt2.setInt(21, percentageDTO.getSem5responce());
+			pstmt2.setString(22, percentageDTO.getSem6percent());
+			pstmt2.setInt(23, percentageDTO.getSem6backs());
+			pstmt2.setInt(24, percentageDTO.getSem6communication());
+			pstmt2.setInt(25, percentageDTO.getSem6responce());
+			pstmt2.setString(26, percentageDTO.getSem7percent());
+			pstmt2.setInt(27, percentageDTO.getSem7backs());
+			pstmt2.setInt(28, percentageDTO.getSem7communication());
+			pstmt2.setInt(29, percentageDTO.getSem7responce());
+			pstmt2.setString(30, percentageDTO.getSem8percent());
+			pstmt2.setInt(31, percentageDTO.getSem8backs());
+			pstmt2.setInt(32, percentageDTO.getSem8communication());
+			pstmt2.setInt(33, percentageDTO.getSem8responce());
+			rs2 = pstmt2.executeUpdate();
+
+			pstmt3 = con
+					.prepareStatement("insert into extra_carricular_activities values(?,?)");
+			pstmt3.setString(1, roll_no);
+			pstmt3.setString(2, extraActivitiesDTO.getExtraActivities());
+			rs3 = pstmt3.executeUpdate();
+
+			if (rs1 > 0 && rs2 > 0 && rs3 > 0) {
+				con.commit();
+				result = true;
+			} else {
+				con.rollback();
+			}
+
+		} finally {
+			if (pstmt1 != null) {
+				pstmt1.close();
+			}
+			if (pstmt2 != null) {
+				pstmt2.close();
+			}
+			if (pstmt3 != null) {
+				pstmt3.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return result;
+	}
+	
+	public static SecondPageDTO getSecondPageData(String rollno)
+			throws ClassNotFoundException, SQLException {
+		
+		SecondPageDTO secondPageDTO =new SecondPageDTO();
+		AttendenceDTO attendenceDTO = null;
+		PercentageDTO percentageDTO = null;
+		ExtraActivitiesDTO extraActivitiesDTO = null;
+		
+		Connection con = null;
+		PreparedStatement pstmt1 = null;
+		PreparedStatement pstmt2 = null;
+		PreparedStatement pstmt3 = null;
+		ResultSet rs1 = null;
+		ResultSet rs2 = null;
+		ResultSet rs3 = null;
+		
+		try {
+			con = getConnection();
+			
+			pstmt1 = con
+					.prepareStatement("select * from student_info where roll_no = '"
+							+ rollno + "'");
+			rs1 = pstmt1.executeQuery();
+			
+			pstmt2 = con
+					.prepareStatement("select * from student_info where roll_no = '"
+							+ rollno + "'");
+			rs2 = pstmt2.executeQuery();
+			
+			pstmt3 = con
+					.prepareStatement("select * from student_info where roll_no = '"
+							+ rollno + "'");
+			rs3 = pstmt3.executeQuery();
+			if (rs.next()) {
+				studentDTO.setName(rs.getString("name"));
+				studentDTO.setDept(rs.getString("dept"));
+				studentDTO.setRoll_no(rs.getString("roll_no"));
+				studentDTO.setEnrollment(rs.getString("enrollment_no"));
+				studentDTO.setBatch(rs.getString("batch"));
+				studentDTO.setSection(rs.getString("section").charAt(0));
+				studentDTO.setIsHosteller(rs.getInt("isHosteller"));
+				studentDTO.setNameOfHostel(rs.getString("nameOfHostel"));
+				studentDTO.setRoomno(rs.getString("room_no"));
+				studentDTO.setRoomPartner1(rs.getString("room_partner1"));
+				studentDTO.setRoomPartner2(rs.getString("room_partner2"));
+				studentDTO.setRoomPartner3(rs.getString("room_partner3"));
+				studentDTO.setPhoneno(rs.getString("phone_no"));
+				studentDTO.setEmailid(rs.getString("email_id"));
+				studentDTO.setAddress(rs.getString("current_address"));
+				ParentDTO dto = new ParentDTO();
+				dto.setName(rs.getString("father_name"));
+				dto.setQualification(rs.getString("father_qualification"));
+				dto.setProfession(rs.getString("father_profession"));
+				dto.setOccupation(rs.getString("father_occupation"));
+				dto.setAnnual_income(rs.getString("father_annual_income"));
+				dto.setAddress(rs.getString("permanent_address"));
+				dto.setPhone_no(rs.getString("permanent_phoneno"));
+				dto.setEmailid(rs.getString("permanent_email"));
+				studentDTO.setFather(dto);
+				dto = null;
+				dto = new ParentDTO();
+				dto.setName(rs.getString("mother_name"));
+				dto.setQualification(rs.getString("mother_qualification"));
+				dto.setProfession(rs.getString("mother_profession"));
+				dto.setOccupation(rs.getString("mother_occupation"));
+				dto.setAnnual_income(rs.getString("mother_annual_income"));
+				dto.setAddress(rs.getString("contact_address"));
+				dto.setPhone_no(rs.getString("contact_phoneno"));
+				dto.setEmailid(rs.getString("contact_email"));
+				studentDTO.setMother(dto);
+				dto = null;
+				dto = new ParentDTO();
+				dto.setName(rs.getString("localguardian_name"));
+				dto.setAddress(rs.getString("localguardian_address"));
+				dto.setPhone_no(rs.getString("localguardian_phoneno"));
+				dto.setEmailid(rs.getString("localguardian_email"));
+				studentDTO.setLocal_guardian(dto);
+				dto = null;
+			} else {
+				secondPageDTO = null;
+			}
+		} finally {
+			if (rs1 != null) {
+				rs1.close();
+			}
+			if (rs2 != null) {
+				rs2.close();
+			}
+			if (rs3 != null) {
+				rs3.close();
+			}
+			if (pstmt1 != null) {
+				pstmt1.close();
+			}
+			if (pstmt2 != null) {
+				pstmt2.close();
+			}
+			if (pstmt3 != null) {
+				pstmt3.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		}
+		return secondPageDTO;
+	}
+
+}

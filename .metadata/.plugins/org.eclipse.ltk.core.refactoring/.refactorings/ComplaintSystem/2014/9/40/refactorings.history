@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;com.hibernate.examples.TestEmployee.java&apos; to &apos;TestHibernate.java&apos;&#x0A;- Original project: &apos;ComplaintSystem&apos;&#x0A;- Original element: &apos;com.hibernate.examples.TestEmployee.java&apos;&#x0A;- Renamed element: &apos;com.hibernate.examples.TestHibernate.java&apos;" description="Rename compilation unit &apos;TestEmployee.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;com.hibernate.examples{TestEmployee.java" name="TestHibernate.java" references="false" stamp="1412005785840" version="1.0"/>
+</session>
